@@ -21,3 +21,12 @@ clean:
 	@echo "Cleaning up"
 	@rm -rf ${BUILD_DIR}
 	@echo "Cleanup complete"
+
+migrate-up:
+	@echo "Migrating up"
+	@bash -c 'source .env && goose -dir sql/migrations $$GOOSE_DRIVER $$GOOSE_DBSTRING up'
+
+
+migrate-down:
+	@echo "Migrating down"
+	@bash -c 'source .env && goose -dir sql/migrations $$GOOSE_DRIVER $$GOOSE_DBSTRING down'
