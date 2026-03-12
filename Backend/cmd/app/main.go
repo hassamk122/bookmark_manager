@@ -8,6 +8,8 @@ import (
 
 	"github.com/hassamk122/bookmark_manager/config"
 	dbconfig "github.com/hassamk122/bookmark_manager/config/db_config"
+	"github.com/hassamk122/bookmark_manager/internals/handlers"
+	"github.com/hassamk122/bookmark_manager/internals/routes"
 )
 
 func main() {
@@ -22,8 +24,14 @@ func main() {
 
 	serverAddr := fmt.Sprintf(":%s", config.ServerPort)
 
+	handler := handlers.NewHandler()
+
+	mux := http.NewServeMux()
+	routes.SetupRoutes(mux, handler)
+
 	server := &http.Server{
-		Addr: serverAddr,
+		Addr:    serverAddr,
+		Handler: mux,
 	}
 
 	log.Printf("Starting server on Port: %s ...", serverAddr)
