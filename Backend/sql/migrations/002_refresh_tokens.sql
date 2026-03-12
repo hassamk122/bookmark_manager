@@ -7,5 +7,8 @@ CREATE TABLE IF NOT EXISTS refresh_tokens(
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE INDEX idx_refresh_tokens_user_id
+ON refresh_tokens(user_id);
+
 -- +goose Down
 DROP TABLE refresh_tokens;

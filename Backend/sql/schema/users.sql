@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS users(
     users_id SERIAL CONSTRAINT users_key PRIMARY KEY,
-    public_id UUID DEFAULT uuid_generate_v4() NOT NULL,
+    public_id UUID DEFAULT uuid_generate_v4() NOT NULL UNIQUE,
     username varchar(50) NOT NULL,
     password varchar(50) NOT NULL,
     email varchar(50) NOT NULL UNIQUE,
