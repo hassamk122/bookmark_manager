@@ -11,5 +11,5 @@ func SetupUserRoutes(mux *http.ServeMux, handler *handlers.Handler) {
 
 	mux.Handle("/users/", http.StripPrefix("/users", userMux))
 
-	userMux.Handle("POST /regitser", handler.CreateUserHandler())
+	userMux.Handle("POST /register", handler.CreateUserHandler())
 }

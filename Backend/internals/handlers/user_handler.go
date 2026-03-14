@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 
 	customerr "github.com/hassamk122/bookmark_manager/internals/custom_err"
@@ -16,6 +17,7 @@ func (h *Handler) CreateUserHandler() http.HandlerFunc {
 		ctx := req.Context()
 		var userReq dtos.CreateUserRequest
 		if err := json.NewDecoder(req.Body).Decode(&userReq); err != nil {
+			log.Println(userReq)
 			utils.RespondWithError(res, http.StatusBadGateway, customerr.ErrInvalidRequestPayload.Error())
 			return
 		}
