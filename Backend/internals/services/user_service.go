@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"database/sql"
+	"log"
 
 	customerr "github.com/hassamk122/bookmark_manager/internals/custom_err"
 	"github.com/hassamk122/bookmark_manager/internals/repos"
@@ -32,26 +33,37 @@ func (s *userService) Register(ctx context.Context, username, email, password st
 		return err
 	}
 
+	log.Println("Starting database transaction")
+
 	defer tx.Rollback()
 
 	qtx := store.New(tx)
 	repo := repos.NewUserRepo(qtx)
 
+	log.Println("Trying to verify if mail exists")
+
 	_, err = repo.GetUserByEmail(ctx, email)
-	if err != nil {
+	if err == nil {
 		return customerr.ErrEmailTaken
 	}
 
+	log.Println("Trying to hash password")
 	hashedPassword, err := utils.HashPassword(password)
 	if err != nil {
 		return err
 	}
 
+	log.Println("Trying to create user")
 	_, err = repo.CreateUser(ctx, store.CreateUserParams{
 		Username: username,
 		Email:    email,
 		Password: hashedPassword,
 	})
+
+	if err != nil {
+		log.Printf("Error creating user. Reason: %v", err)
+		return err
+	}
 
 	return tx.Commit()
 }

@@ -14,7 +14,9 @@ import (
 
 func (h *Handler) CreateUserHandler() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
+
 		ctx := req.Context()
+
 		var userReq dtos.CreateUserRequest
 		if err := json.NewDecoder(req.Body).Decode(&userReq); err != nil {
 			log.Println(userReq)
@@ -22,10 +24,14 @@ func (h *Handler) CreateUserHandler() http.HandlerFunc {
 			return
 		}
 
+		log.Println("Request matches the required dto")
+
 		if err := validation.Validate(&userReq); err != nil {
 			utils.RespondWithError(res, http.StatusBadRequest, err.Error())
 			return
 		}
+
+		log.Println("Valid payload Trying to register")
 
 		err := h.UserService.Register(ctx, userReq.Username, userReq.Email, userReq.Password)
 		if errors.Is(err, customerr.ErrEmailTaken) {
@@ -37,6 +43,8 @@ func (h *Handler) CreateUserHandler() http.HandlerFunc {
 			utils.RespondWithError(res, http.StatusInternalServerError, customerr.ErrSomethingWentWrong.Error())
 			return
 		}
+
+		log.Println("Request successful")
 
 		utils.RespondWithSuccess(res, http.StatusCreated, "User created Successfully", nil)
 	}
