@@ -9,7 +9,10 @@ import (
 	"github.com/hassamk122/bookmark_manager/config"
 	dbconfig "github.com/hassamk122/bookmark_manager/config/db_config"
 	"github.com/hassamk122/bookmark_manager/internals/handlers"
+	"github.com/hassamk122/bookmark_manager/internals/repos"
 	"github.com/hassamk122/bookmark_manager/internals/routes"
+	"github.com/hassamk122/bookmark_manager/internals/services"
+	"github.com/hassamk122/bookmark_manager/internals/store"
 )
 
 func main() {
@@ -22,9 +25,14 @@ func main() {
 	db := dbconfig.ConnectToDB(config.DatabaseUrl)
 	defer db.Close()
 
+	queries := store.New(db)
+
+	userRepo := repos.NewUserRepo(queries)
+	userService := services.NewUserService(db, userRepo)
+
 	serverAddr := fmt.Sprintf(":%s", config.ServerPort)
 
-	handler := handlers.NewHandler()
+	handler := handlers.NewHandler(userService)
 
 	mux := http.NewServeMux()
 	routes.SetupRoutes(mux, handler)

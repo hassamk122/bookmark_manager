@@ -2,20 +2,21 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
+	customerr "github.com/hassamk122/bookmark_manager/internals/custom_err"
 	"github.com/hassamk122/bookmark_manager/internals/dtos"
-	"github.com/hassamk122/bookmark_manager/internals/errors"
 	"github.com/hassamk122/bookmark_manager/internals/utils"
 	"github.com/hassamk122/bookmark_manager/internals/validation"
 )
 
 func (h *Handler) CreateUserHandler() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-
+		ctx := req.Context()
 		var userReq dtos.CreateUserRequest
 		if err := json.NewDecoder(req.Body).Decode(&userReq); err != nil {
-			utils.RespondWithError(res, http.StatusBadGateway, errors.ErrInvalidRequestPayload)
+			utils.RespondWithError(res, http.StatusBadGateway, customerr.ErrInvalidRequestPayload.Error())
 			return
 		}
 
@@ -24,6 +25,17 @@ func (h *Handler) CreateUserHandler() http.HandlerFunc {
 			return
 		}
 
-		// have to create service to register
+		err := h.UserService.Register(ctx, userReq.Username, userReq.Email, userReq.Password)
+		if errors.Is(err, customerr.ErrEmailTaken) {
+			utils.RespondWithError(res, http.StatusConflict, customerr.ErrEmailTaken.Error())
+			return
+		}
+
+		if err != nil {
+			utils.RespondWithError(res, http.StatusInternalServerError, customerr.ErrSomethingWentWrong.Error())
+			return
+		}
+
+		utils.RespondWithSuccess(res, http.StatusCreated, "User created Successfully", nil)
 	}
 }

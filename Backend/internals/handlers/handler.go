@@ -1,7 +1,13 @@
 package handlers
 
-type Handler struct{}
+import "github.com/hassamk122/bookmark_manager/internals/services"
 
-func NewHandler() *Handler {
-	return &Handler{}
+type Handler struct {
+	UserService services.UserService
+}
+
+func NewHandler(userService services.UserService) *Handler {
+	return &Handler{
+		UserService: userService,
+	}
 }
