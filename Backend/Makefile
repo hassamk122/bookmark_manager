@@ -7,6 +7,10 @@ run:
 	@echo "Running the Server"
 	@go run cmd/app/main.go
 
+test:
+	@echo "Running the Tests"
+	@go test -v ./...
+
 deps:
 	@echo "Installing dependencies"
 	@go mod tidy
