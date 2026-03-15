@@ -19,8 +19,7 @@ func (h *Handler) CreateUserHandler() http.HandlerFunc {
 
 		var userReq dtos.CreateUserRequest
 		if err := json.NewDecoder(req.Body).Decode(&userReq); err != nil {
-			log.Println(userReq)
-			utils.RespondWithError(res, http.StatusBadGateway, customerr.ErrInvalidRequestPayload.Error())
+			utils.RespondWithError(res, http.StatusBadGateway, customerr.InvalidRequestPayload.Error())
 			return
 		}
 
@@ -34,13 +33,13 @@ func (h *Handler) CreateUserHandler() http.HandlerFunc {
 		log.Println("Valid payload Trying to register")
 
 		err := h.UserService.Register(ctx, userReq.Username, userReq.Email, userReq.Password)
-		if errors.Is(err, customerr.ErrEmailTaken) {
-			utils.RespondWithError(res, http.StatusConflict, customerr.ErrEmailTaken.Error())
+		if errors.Is(err, customerr.EmailTaken) {
+			utils.RespondWithError(res, http.StatusConflict, customerr.EmailTaken.Error())
 			return
 		}
 
 		if err != nil {
-			utils.RespondWithError(res, http.StatusInternalServerError, customerr.ErrSomethingWentWrong.Error())
+			utils.RespondWithError(res, http.StatusInternalServerError, customerr.SomethingWentWrong.Error())
 			return
 		}
 

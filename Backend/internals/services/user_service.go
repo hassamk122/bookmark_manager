@@ -44,7 +44,7 @@ func (s *userService) Register(ctx context.Context, username, email, password st
 
 	_, err = repo.GetUserByEmail(ctx, email)
 	if err == nil {
-		return customerr.ErrEmailTaken
+		return customerr.EmailTaken
 	}
 
 	log.Println("Trying to hash password")
