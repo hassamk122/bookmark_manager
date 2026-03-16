@@ -18,7 +18,8 @@ func (h *Handler) CreateUserHandler() http.HandlerFunc {
 		ctx := req.Context()
 
 		var userReq dtos.CreateUserRequest
-		if err := json.NewDecoder(req.Body).Decode(&userReq); err != nil {
+
+		if err := decodeBodyFromReq(req).Decode(&userReq); err != nil {
 			utils.RespondWithError(res, http.StatusBadGateway, customerr.InvalidRequestPayload.Error())
 			return
 		}
@@ -46,5 +47,32 @@ func (h *Handler) CreateUserHandler() http.HandlerFunc {
 		log.Println("Request successful")
 
 		utils.RespondWithSuccess(res, http.StatusCreated, "User created Successfully", nil)
+	}
+}
+
+func decodeBodyFromReq(req *http.Request) *json.Decoder {
+	decoder := json.NewDecoder(req.Body)
+	decoder.DisallowUnknownFields()
+	return decoder
+}
+
+func (h *Handler) LoginUserHandler() http.HandlerFunc {
+	return func(res http.ResponseWriter, req *http.Request) {
+
+		var userReq dtos.LoginRequest
+
+		if err := decodeBodyFromReq(req).Decode(&userReq); err != nil {
+			utils.RespondWithError(res, http.StatusBadGateway, customerr.InvalidRequestPayload.Error())
+			return
+		}
+
+		log.Println("Request matches the required dto")
+
+		if err := validation.Validate(&userReq); err != nil {
+			utils.RespondWithError(res, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		// have to implement refresh token based impl
 	}
 }

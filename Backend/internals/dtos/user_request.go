@@ -5,3 +5,8 @@ type CreateUserRequest struct {
 	Email    string `json:"email" validate:"required,min=7,max=30"`
 	Password string `json:"password" validate:"required,min=8"`
 }
+
+type LoginRequest struct {
+	Email    string `json:"email" validate:"required,min=7,max=30"`
+	Password string `json:"password" validate:"required,min=8"`
+}
