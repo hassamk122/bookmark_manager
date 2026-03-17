@@ -13,6 +13,7 @@ import (
 
 type UserService interface {
 	Register(ctx context.Context, username, email, password string) error
+	ValidUser(ctx context.Context, email string, password string) error
 }
 
 type userService struct {
@@ -66,4 +67,17 @@ func (s *userService) Register(ctx context.Context, username, email, password st
 	}
 
 	return tx.Commit()
+}
+
+func (s *userService) ValidUser(ctx context.Context, email string, password string) error {
+	user, err := s.UserRepo.GetUserByEmailIncludePassword(ctx, email)
+	if err != nil {
+		return customerr.InvalidCredentials
+	}
+
+	if !utils.ComparePassword(user.Password, password) {
+		return customerr.InvalidCredentials
+	}
+
+	return nil
 }

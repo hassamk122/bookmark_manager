@@ -58,7 +58,7 @@ func decodeBodyFromReq(req *http.Request) *json.Decoder {
 
 func (h *Handler) LoginUserHandler() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
-
+		ctx := req.Context()
 		var userReq dtos.LoginRequest
 
 		if err := decodeBodyFromReq(req).Decode(&userReq); err != nil {
@@ -73,6 +73,10 @@ func (h *Handler) LoginUserHandler() http.HandlerFunc {
 			return
 		}
 
-		// have to implement refresh token based impl
+		if err := h.UserService.ValidUser(ctx, userReq.Email, userReq.Password); err != nil {
+			utils.RespondWithError(res, http.StatusUnauthorized, err.Error())
+			return
+		}
+
 	}
 }
